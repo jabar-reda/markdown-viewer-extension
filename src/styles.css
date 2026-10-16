@@ -51,6 +51,20 @@ body { font-family: "Segoe UI", Tahoma, Arial, sans-serif; line-height: 1.7; }
 .markdown-body img { max-width: 100%; }
 .markdown-body hr { border: none; border-top: 1px solid var(--border); }
 #mdv-raw { max-width: 1100px; margin: 0 auto 60px; padding: 16px; white-space: pre-wrap; }
+#mdv-reload-btn[data-on="false"] { opacity: 0.65; }
+
+/* Copy button on every code block: visible on hover/focus, themed via vars */
+.mdv-code-wrap { position: relative; }
+.mdv-code-wrap pre { margin: 12px 0; padding-top: 34px; }
+.mdv-copy-btn {
+  position: absolute; top: 8px; right: 8px; z-index: 2;
+  padding: 4px 10px; cursor: pointer; font-size: 12px;
+  border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg); color: var(--fg); opacity: 0;
+}
+.mdv-code-wrap:hover .mdv-copy-btn,
+.mdv-code-wrap:focus-within .mdv-copy-btn,
+.mdv-copy-btn:focus { opacity: 1; }
 
 @media (max-width: 800px) {
   #mdv-layout { flex-direction: column; }

@@ -1,7 +1,7 @@
 # Markdown Viewer
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.1.2-green.svg)](manifest.json)
+[![Version](https://img.shields.io/badge/version-1.2.0-green.svg)](manifest.json)
 [![Chrome](https://img.shields.io/badge/Chrome-120%2B-orange.svg)](https://www.google.com/chrome/)
 [![Manifest](https://img.shields.io/badge/Manifest-V3-lightgrey.svg)](https://developer.chrome.com/docs/extensions/develop/manifest)
 
@@ -40,7 +40,11 @@ Verify: open any local file such as `file:///C:/notes/todo.md` — it should ren
 
 ## Usage
 
-**Render a file.** Open any `.md`, `.markdown`, `.mdown`, or `.mkd` file directly via `file:///`. You get a header bar (filename, theme toggle, raw/rendered toggle) plus an auto-built table of contents from the headings.
+**Render a file.** Open any `.md`, `.markdown`, `.mdown`, or `.mkd` file directly via `file:///`. You get a header bar (filename, theme toggle, live-reload toggle, raw/rendered toggle) plus an auto-built table of contents from the headings.
+
+**Live reload.** The page re-checks the file every 2 seconds and re-renders on change — edit in your editor and watch the tab update, scroll position kept. Pause it from the `Live: On` button; polling stops automatically while the tab is hidden.
+
+**Copy code.** Every code block has a **Copy** button (top right, on hover) with a `Copied` confirmation.
 
 **Fix a bad path.** Click the extension icon in the toolbar, paste a path, and convert it:
 
@@ -55,6 +59,8 @@ Then **Open** it in a tab or **Copy** the fixed link. Paths inside rendered file
 
 - Formatted rendering: headings, tables, lists, checkboxes, fenced code (including indented fences inside lists), quotes, frontmatter stripping
 - Dark / light mode, follows your OS setting, one-click toggle, persisted
+- Live reload (2s poll, pausable, pauses in hidden tabs)
+- Copy button on every code block
 - `C://` and `C:\` path fixing, in pages and in the popup
 - Zero dependencies and zero network calls — safe for sensitive local files
 

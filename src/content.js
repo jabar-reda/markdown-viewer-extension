@@ -163,7 +163,7 @@
         } else if (fence[1].charAt(0) === fenceChar) {
           inCode = false;
           var cls = codeLang ? ' class="language-' + escapeHtml(codeLang) + '"' : '';
-          html.push('<pre><code' + cls + '>' + escapeHtml(codeBuf.join('\n')) + '</code></pre>');
+          html.push('<div class="mdv-code-wrap"><button type="button" class="mdv-copy-btn">Copy</button><pre><code' + cls + '>' + escapeHtml(codeBuf.join('\n')) + '</code></pre></div>');
         } else {
           codeBuf.push(line); // mismatched fence char inside code is content
         }
@@ -258,7 +258,7 @@
           cb2.push(lines[i].replace(/^    /, ''));
           i++;
         }
-        html.push('<pre><code>' + escapeHtml(cb2.join('\n')) + '</code></pre>');
+        html.push('<div class="mdv-code-wrap"><button type="button" class="mdv-copy-btn">Copy</button><pre><code>' + escapeHtml(cb2.join('\n')) + '</code></pre></div>');
         continue;
       }
       // blank
@@ -273,7 +273,7 @@
     closeLists();
     closeQuote();
     if (inCode) {
-      html.push('<pre><code>' + escapeHtml(codeBuf.join('\n')) + '</code></pre>');
+      html.push('<div class="mdv-code-wrap"><button type="button" class="mdv-copy-btn">Copy</button><pre><code>' + escapeHtml(codeBuf.join('\n')) + '</code></pre></div>');
     }
     return html.join('\n');
   }
@@ -317,9 +317,12 @@
     } catch (e) { return location.href; }
   }
 
-  var bodyHtml = parseMarkdown(raw);
+  var LIVE_KEY = 'mdv-live';
+  var liveReload = true;
+  var lastRenderedRaw = raw;
+
   // TOC from h1-h3
-  function buildTOC() {
+  function buildTOC(bodyHtml) {
     var tmp = document.createElement('div');
     tmp.innerHTML = bodyHtml;
     var heads = tmp.querySelectorAll('h1, h2, h3');
@@ -333,40 +336,180 @@
     return out + '</ul></nav>';
   }
 
-  document.title = fileName() + ' — Markdown Viewer';
-  document.body.innerHTML = '';
-  var root = document.createElement('div');
-  root.id = 'mdv-root';
-  root.innerHTML =
-    '<header id="mdv-bar">' +
-      '<span id="mdv-file">📄 ' + escapeHtml(fileName()) + '</span>' +
-      '<span id="mdv-actions">' +
-        '<button id="mdv-theme-btn" title="Toggle dark/light">🌙 Dark</button>' +
-        '<button id="mdv-raw-btn" title="Show raw text">‹› Raw</button>' +
-      '</span>' +
-    '</header>' +
-    '<div id="mdv-layout">' +
-      buildTOC() +
-      '<article id="mdv-article" class="markdown-body">' + bodyHtml + '</article>' +
-    '</div>' +
-    '<pre id="mdv-raw" style="display:none"></pre>';
-  document.body.appendChild(root);
-  document.getElementById('mdv-raw').textContent = raw;
-
-  getPreferredTheme(function (t) { setTheme(t); });
-
-  document.getElementById('mdv-theme-btn').addEventListener('click', function () {
-    var cur = document.documentElement.getAttribute('data-theme') || 'light';
-    setTheme(cur === 'dark' ? 'light' : 'dark');
-  });
-  document.getElementById('mdv-raw-btn').addEventListener('click', function () {
+  function isRawShowing() {
     var r = document.getElementById('mdv-raw');
-    var a = document.getElementById('mdv-article');
-    var toc = document.getElementById('mdv-toc');
-    var showing = r.style.display !== 'none';
-    r.style.display = showing ? 'none' : 'block';
-    a.style.display = showing ? 'block' : 'none';
-    if (toc) toc.style.display = showing ? 'block' : 'none';
-    this.textContent = showing ? '‹› Raw' : '📖 Rendered';
+    return !!(r && r.style.display !== 'none');
+  }
+
+  function copyBlockText(text, btn) {
+    function done(ok) {
+      if (!btn) return;
+      try {
+        btn.textContent = ok ? 'Copied' : 'Failed';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 1500);
+      } catch (e) {}
+    }
+    function fallbackCopy() {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (e2) { ok = false; }
+        document.body.removeChild(ta);
+        done(!!ok);
+      } catch (e) { done(false); }
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, function () { fallbackCopy(); });
+      } else {
+        fallbackCopy();
+      }
+    } catch (e) { fallbackCopy(); }
+  }
+
+  // Re-render new source text in place: preserves scrollY, theme and
+  // raw/rendered toggle state, rebuilds the TOC.
+  function updateContent(newRaw) {
+    var scrollY = (typeof window.scrollY === 'number') ? window.scrollY : 0;
+    var rawShowing = isRawShowing();
+    var nextHtml = parseMarkdown(newRaw);
+    var article = document.getElementById('mdv-article');
+    var layout = document.getElementById('mdv-layout');
+    if (article) article.innerHTML = nextHtml;
+    var oldToc = document.getElementById('mdv-toc');
+    if (oldToc && oldToc.parentNode) oldToc.parentNode.removeChild(oldToc);
+    var tocHtml = buildTOC(nextHtml);
+    if (tocHtml && layout && article) {
+      var tmp2 = document.createElement('div');
+      tmp2.innerHTML = tocHtml;
+      var nav = tmp2.firstChild;
+      if (nav) {
+        if (rawShowing) nav.style.display = 'none';
+        layout.insertBefore(nav, article);
+      }
+    }
+    var rawEl = document.getElementById('mdv-raw');
+    if (rawEl) rawEl.textContent = newRaw;
+    if (rawShowing && article) article.style.display = 'none';
+    try { window.scrollTo(0, scrollY); } catch (e) {}
+  }
+
+  function setLiveReload(on) {
+    liveReload = !!on;
+    try {
+      if (window.chrome && chrome.storage && chrome.storage.local) {
+        var o = {}; o[LIVE_KEY] = liveReload;
+        chrome.storage.local.set(o);
+      } else {
+        try { localStorage.setItem(LIVE_KEY, liveReload ? 'on' : 'off'); } catch (e2) {}
+      }
+    } catch (e) {}
+    var btn = document.getElementById('mdv-reload-btn');
+    if (btn) {
+      btn.textContent = liveReload ? 'Live: On' : 'Live: Off';
+      btn.setAttribute('data-on', liveReload ? 'true' : 'false');
+      btn.title = liveReload ? 'Pause live reload' : 'Resume live reload';
+    }
+  }
+
+  function loadLiveReload() {
+    try {
+      if (window.chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.get([LIVE_KEY], function (res) {
+          if (res && typeof res[LIVE_KEY] === 'boolean') setLiveReload(res[LIVE_KEY]);
+        });
+        return;
+      }
+    } catch (e) {}
+    try {
+      var v = localStorage.getItem(LIVE_KEY);
+      if (v === 'off') setLiveReload(false);
+    } catch (e2) {}
+  }
+
+  // Initial render (one-shot shell; later updates go through updateContent)
+  function render(rawText) {
+    var bodyHtml = parseMarkdown(rawText);
+    document.title = fileName() + ' — Markdown Viewer';
+    document.body.innerHTML = '';
+    var root = document.createElement('div');
+    root.id = 'mdv-root';
+    root.innerHTML =
+      '<header id="mdv-bar">' +
+        '<span id="mdv-file">📄 ' + escapeHtml(fileName()) + '</span>' +
+        '<span id="mdv-actions">' +
+          '<button id="mdv-reload-btn" data-on="true" title="Pause live reload">Live: On</button>' +
+          '<button id="mdv-theme-btn" title="Toggle dark/light">🌙 Dark</button>' +
+          '<button id="mdv-raw-btn" title="Show raw text">‹› Raw</button>' +
+        '</span>' +
+      '</header>' +
+      '<div id="mdv-layout">' +
+        buildTOC(bodyHtml) +
+        '<article id="mdv-article" class="markdown-body">' + bodyHtml + '</article>' +
+      '</div>' +
+      '<pre id="mdv-raw" style="display:none"></pre>';
+    document.body.appendChild(root);
+    document.getElementById('mdv-raw').textContent = rawText;
+
+    // Copy buttons: single delegated listener on the root survives re-renders.
+    root.addEventListener('click', function (ev) {
+      var t = ev.target;
+      if (!t || !t.classList || !t.classList.contains('mdv-copy-btn')) return;
+      var wrap = t.closest ? t.closest('.mdv-code-wrap') : null;
+      var code = wrap ? wrap.querySelector('pre code') : null;
+      copyBlockText(code ? code.textContent : '', t);
+    });
+
+    getPreferredTheme(function (t) { setTheme(t); });
+    loadLiveReload();
+
+    document.getElementById('mdv-theme-btn').addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-theme') || 'light';
+      setTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+    document.getElementById('mdv-reload-btn').addEventListener('click', function () {
+      setLiveReload(!liveReload);
+    });
+    document.getElementById('mdv-raw-btn').addEventListener('click', function () {
+      var r = document.getElementById('mdv-raw');
+      var a = document.getElementById('mdv-article');
+      var toc = document.getElementById('mdv-toc');
+      var showing = r.style.display !== 'none';
+      r.style.display = showing ? 'none' : 'block';
+      a.style.display = showing ? 'block' : 'none';
+      if (toc) toc.style.display = showing ? 'block' : 'none';
+      this.textContent = showing ? '‹› Raw' : '📖 Rendered';
+    });
+  }
+
+  render(raw);
+
+  // ---------- live reload: poll the file, re-render in place on change ----------
+  function pollOnce() {
+    if (!liveReload) return;
+    if (document.hidden) return; // paused while the tab is hidden
+    var p;
+    try {
+      p = fetch(location.href, { cache: 'no-store' });
+    } catch (e) { return; }
+    p.then(function (res) {
+      if (!res || !res.ok) return null;
+      return res.text();
+    }).then(function (text) {
+      if (text === null || text === undefined) return;
+      if (text !== lastRenderedRaw) {
+        lastRenderedRaw = text;
+        updateContent(text);
+      }
+    }).catch(function () { /* ignore: e.g. file URL access not allowed */ });
+  }
+  setInterval(pollOnce, 2000);
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) pollOnce();
   });
 })();
