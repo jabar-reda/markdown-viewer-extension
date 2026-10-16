@@ -40,7 +40,7 @@
       var link = document.createElement('link');
       link.id = 'mdv-style';
       link.rel = 'stylesheet';
-      link.href = chrome.runtime.getURL('styles.css');
+      link.href = chrome.runtime.getURL('src/styles.css');
       (document.head || document.documentElement).appendChild(link);
     } catch (e) {}
   })();

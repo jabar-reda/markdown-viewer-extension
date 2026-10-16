@@ -1,23 +1,43 @@
-# Markdown Viewer (Local File) — Chrome compatible
+# Markdown Viewer
 
-## Install (no store, suitable for a work environment)
+View local Markdown files in Chrome, beautifully. Fully offline.
+
+Open any `file:///C:/path/to/file.md` and it renders as a formatted page instead of raw text. Bad Windows paths like `C://Users/...` are converted to working `file:///` links automatically.
+
+## Features
+
+- Formatted rendering: headings, tables, lists, checkboxes, code blocks, quotes
+- Dark / light mode with one click (follows your system by default)
+- Table of contents + raw/rendered toggle
+- `C://` path fixer, built into pages and the toolbar popup
+- Zero dependencies, zero network — everything runs locally
+
+## Install
+
 1. Open `chrome://extensions`
 2. Enable **Developer mode**
-3. **Load unpacked** ← select this folder
-4. On the extension details page enable **Allow access to file URLs** (required for `file:///` files)
-5. Open any file like `file:///C:/path/to/file.md` — it renders formatted
+3. **Load unpacked** → select this folder
+4. On the extension details page, enable **Allow access to file URLs**
+5. Open a `.md` file via `file:///` — done
 
-## Path fixer
-- Any `C://Users/...` text inside a file is automatically converted to `file:///C:/Users/...`
-- From the extension icon (popup) paste a bad path → convert → open/copy
+> Chrome blocks `file:///` links from `http(s)` pages by design. This extension only renders files you open directly — nothing is uploaded or shared.
 
-## Project files
-- `manifest.json` — MV3
-- `content.js` — lightweight dependency-free Markdown parser (works offline on `file://`)
-- `styles.css` — dark/light + tables + code
-- `popup.html/js` — `C://` converter
-- `logo.svg` + `icons/` — logo and toolbar icons
-- `test-sample.md` — test file
+## Project structure
+
+```
+manifest.json        Extension manifest (MV3)
+src/
+  content.js         Markdown parser + page renderer
+  styles.css         Dark/light theme (injected on .md pages only)
+  popup.html/js      Toolbar popup: C:// path converter
+icons/               Toolbar icons (16/32/48/128 PNG)
+assets/logo.svg      Logo source
+```
 
 ## Test
-Open `test-sample.md` via `file:///` after installing.
+
+After installing, open `test-sample.md` (kept local, not committed) via `file:///`.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
