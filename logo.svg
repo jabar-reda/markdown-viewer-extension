@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Markdown Viewer logo">
+  <title>Markdown Viewer — local file</title>
+  <!-- Built on an 8-unit modular grid. One 8-unit stroke (the '#', round caps).
+       Three flat fills, no filters, no text. All coordinates are multiples of 4. -->
+  <rect x="24" y="24" width="208" height="208" rx="48" fill="#232D3F"/>
+  <path d="M88 72 h56 l24 24 v88 H88 z" fill="#FFFFFF"/>
+  <path d="M144 72 v24 h24 z" fill="#0E7C7B"/>
+  <g stroke="#0E7C7B" stroke-width="8" stroke-linecap="round">
+    <line x1="104" y1="104" x2="104" y2="128"/>
+    <line x1="116" y1="104" x2="116" y2="128"/>
+    <line x1="96" y1="112" x2="124" y2="112"/>
+    <line x1="96" y1="120" x2="124" y2="120"/>
+  </g>
+  <rect x="132" y="104" width="28" height="8" rx="4" fill="#232D3F"/>
+  <rect x="96" y="140" width="64" height="8" rx="4" fill="#232D3F" opacity="0.45"/>
+  <rect x="96" y="156" width="52" height="8" rx="4" fill="#232D3F" opacity="0.45"/>
+</svg>

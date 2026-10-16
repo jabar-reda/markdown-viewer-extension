@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<style>
+body { width: 300px; font-family: "Segoe UI", Tahoma, sans-serif; padding: 12px; font-size: 14px; }
+input, button { width: 100%; box-sizing: border-box; margin: 6px 0; padding: 8px; font-size: 13px; }
+button { cursor: pointer; }
+#out { direction: ltr; text-align: left; background: #f6f8fa; border: 1px solid #d1d9e0; border-radius: 6px; padding: 8px; word-break: break-all; min-height: 40px; }
+small { color: #59636e; }
+.row { display: flex; gap: 6px; }
+.row button { flex: 1; }
+</style>
+</head>
+<body>
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+<img src="logo.svg" width="28" height="28" alt="logo">
+<h3 style="margin:0">C:// Path Fixer</h3>
+</div>
+<p><small>Paste a bad path like <b dir="ltr">C://Users/jabar/file.md</b> to convert it to <b dir="ltr">file:///C:/Users/jabar/file.md</b></small></p>
+<input id="in" dir="ltr" placeholder="C://Users/jabar/file.md">
+<button id="fix">Convert</button>
+<div id="out" dir="ltr">—</div>
+<div class="row">
+<button id="open">Open</button>
+<button id="copy">Copy</button>
+</div>
+<hr>
+<p><small>To render file:/// pages:<br>chrome://extensions → extension details → enable <b>Allow access to file URLs</b></small></p>
+<script src="popup.js"></script>
+</body>
+</html>

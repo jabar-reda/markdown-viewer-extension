@@ -1,0 +1,7 @@
+# Local-only files, not part of the extension
+CONTEXT.md
+test-sample.md
+
+# OS / editor noise
+Thumbs.db
+.DS_Store

@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "minimum_chrome_version": "120",
+  "name": "Markdown Viewer (Local File)",
+  "version": "1.1.2",
+  "description": "Render local .md files opened via file:/// as formatted HTML. Fixes bad C:// paths. Works offline, no server.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": ["storage"],
+  "action": {
+    "default_title": "Markdown Viewer",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["file:///*"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["styles.css"],
+      "matches": ["file:///*"]
+    }
+  ]
+}
