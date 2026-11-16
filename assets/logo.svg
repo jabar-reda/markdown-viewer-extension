@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Markdown Viewer logo">
-  <title>Markdown Viewer — local file</title>
+  <title>Markdown Viewer</title>
   <!-- Built on an 8-unit modular grid. One 8-unit stroke (the '#', round caps).
        Three flat fills, no filters, no text. All coordinates are multiples of 4. -->
   <rect x="24" y="24" width="208" height="208" rx="48" fill="#232D3F"/>

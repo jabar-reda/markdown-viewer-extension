@@ -1,4 +1,4 @@
-/* Markdown Viewer (Local File) - content.js
+/* Markdown Viewer - content.js
  * Compatible with Chrome 100: ES2019 only, no modules, no top-level await.
  * Works on file:/// pages that Chrome renders as <pre> raw text.
  */
