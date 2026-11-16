@@ -1,5 +1,9 @@
 # Markdown Viewer
 
+<p align="center">
+  <img src="assets/logo-on-dark.svg" alt="Markdown Viewer logo" width="96" height="96">
+</p>
+
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.2.0-green.svg)](manifest.json)
 [![Chrome](https://img.shields.io/badge/Chrome-120%2B-orange.svg)](https://www.google.com/chrome/)
