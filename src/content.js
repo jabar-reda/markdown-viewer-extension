@@ -181,7 +181,7 @@
         flushPara(); closeLists(); closeQuote();
         var lvl = h[1].length;
         var text = h[2].replace(/\s+#+\s*$/, '');
-        var id = text.toLowerCase().replace(/[^\w\u0600-\u06FF\s-]/g, '').trim().replace(/\s+/g, '-');
+        var id = text.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-');
         html.push('<h' + lvl + ' id="' + escapeHtml(id) + '">' + parseInline(text) + '</h' + lvl + '>');
         i++; continue;
       }
